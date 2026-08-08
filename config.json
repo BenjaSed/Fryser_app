@@ -1,0 +1,14 @@
+{
+  "name": "Fryser oversigt",
+  "version": "1.0.2",
+  "slug": "freezer_manager",
+  "description": "AppSheet freezer replica with search, duplication, and list views.",
+  "arch": ["amd64", "aarch64", "armv7"],
+  "startup": "services",
+  "boot": "auto",
+  "ingress": true,
+  "ingress_port": 8000,
+  "panel_title": "Fryser",
+  "panel_icon": "mdi:snowflake",
+  "init": false
+}

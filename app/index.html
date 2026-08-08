@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#1E9E6C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Hylder i fryseren</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-shell: #EAEFF4;
+      --bg-app: #FFFFFF;
+      --bg-subtle: #F3F5F8;
+      --text-primary: #1B2430;
+      --text-secondary: #66707E;
+      --text-tertiary: #9AA3B0;
+      --border: #E7EBF0;
+      --accent: #1E9E6C;
+      --accent-hover: #178457;
+      --accent-soft: #E4F6EE;
+      --danger: #D6493A;
+      --danger-soft: #FBEAE8;
+      --info: #3576C7;
+      --info-soft: #EAF2FB;
+    }
+
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+    html, body {
+      background: var(--bg-shell);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text-primary);
+      overscroll-behavior: none;
+      height: 100%;
+    }
+
+    button { touch-action: manipulation; font-family: inherit; }
+
+    .viewport-bg {
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 440px;
+      height: 100dvh;
+      background: var(--bg-app);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 640px) {
+      .viewport-bg { align-items: center; padding: 32px 16px; }
+      .app-shell {
+        height: min(860px, 92vh);
+        border-radius: 26px;
+        box-shadow: 0 24px 60px -16px rgba(20, 30, 45, 0.28), 0 0 0 1px rgba(20, 30, 45, 0.05);
+      }
+    }
+
+    /* Topbar */
+    .topbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+    .topbar-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+    .segmented { display: flex; background: var(--bg-subtle); border-radius: 10px; padding: 3px; gap: 2px; }
+    .seg-btn {
+      width: 34px; height: 30px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; color: var(--text-tertiary); user-select: none;
+    }
+    .seg-btn.active { background: #fff; color: var(--accent); box-shadow: 0 1px 2px rgba(15,23,32,.1); }
+
+    /* Search */
+    .search-wrap { flex-shrink: 0; padding: 10px 18px 12px; }
+    .search-field { position: relative; display: flex; align-items: center; background: var(--bg-subtle); border-radius: 11px; padding: 0 10px; }
+    .search-icon { color: var(--text-tertiary); display: flex; flex-shrink: 0; }
+    .search-input { flex: 1; background: transparent; border: none; padding: 9px 8px; font-size: 14px; color: var(--text-primary); outline: none; }
+    .search-input::placeholder { color: var(--text-tertiary); }
+    .search-clear { color: var(--text-tertiary); display: flex; padding: 4px; flex-shrink: 0; }
+
+    /* Scroll area */
+    .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+
+    .shelf-header {
+      position: sticky; top: 0; z-index: 5;
+      background: var(--bg-subtle); color: var(--text-secondary);
+      font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      padding: 8px 18px;
+    }
+
+    .item-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px; border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .item-row:active { background: var(--bg-subtle); }
+    .item-name { font-size: 14.5px; font-weight: 600; }
+    .item-meta { font-size: 12.5px; color: var(--text-tertiary); margin-top: 3px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .dot { opacity: .55; }
+    .tag { background: var(--bg-subtle); color: var(--text-secondary); padding: 1px 6px; border-radius: 5px; font-size: 11px; font-weight: 600; }
+    .item-side { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .qty-pill { background: var(--accent-soft); color: var(--accent-hover); font-size: 12.5px; font-weight: 700; padding: 4px 9px; border-radius: 99px; white-space: nowrap; }
+    .chevron { color: var(--text-tertiary); display: flex; }
+
+    .sort-bar {
+      position: sticky; top: 0; z-index: 5; background: var(--bg-app);
+      display: flex; gap: 6px; padding: 10px 18px; overflow-x: auto; border-bottom: 1px solid var(--border);
+    }
+    .sort-bar::-webkit-scrollbar { display: none; }
+    .sort-chip {
+      flex-shrink: 0; display: flex; align-items: center; gap: 4px;
+      font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
+      background: var(--bg-subtle); padding: 6px 11px; border-radius: 99px; white-space: nowrap; user-select: none;
+    }
+    .sort-chip.active { background: var(--accent-soft); color: var(--accent-hover); }
+
+    .empty-state { padding: 70px 24px; text-align: center; color: var(--text-tertiary); font-size: 14px; }
+
+    /* FAB */
+    .fab {
+      position: absolute; right: 20px; bottom: calc(24px + env(safe-area-inset-bottom));
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--accent); color: #fff; border: none;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 10px 24px -6px rgba(30,158,108,.55), 0 2px 6px rgba(15,23,32,.15);
+      z-index: 20;
+    }
+    .fab:active { transform: scale(.94); }
+
+    /* Bottom sheet */
+    .sheet-backdrop {
+      position: absolute; inset: 0; z-index: 40;
+      background: rgba(15,23,32,.5);
+      display: flex; align-items: flex-end;
+    }
+    .sheet {
+      width: 100%; max-height: 90%;
+      background: var(--bg-app);
+      border-radius: 20px 20px 0 0;
+      padding: 10px 20px calc(20px + env(safe-area-inset-bottom));
+      overflow-y: auto;
+      box-shadow: 0 -8px 30px rgba(15,23,32,.15);
+      display: flex; flex-direction: column;
+    }
+    .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 99px; margin: 4px auto 14px; }
+    .sheet-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .sheet-header h2 { font-size: 16px; font-weight: 700; }
+    .icon-btn { color: var(--text-tertiary); display: flex; padding: 6px; border-radius: 8px; }
+    .icon-btn:active { background: var(--bg-subtle); }
+
+    .field { margin-bottom: 14px; }
+    .field-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+    .field-input {
+      width: 100%; background: var(--bg-subtle); border: 1px solid transparent; border-radius: 12px;
+      padding: 10px 12px; font-size: 14px; color: var(--text-primary); outline: none;
+    }
+    .field-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px var(--accent-soft); }
+
+    .field-select {
+      width: 100%; background-color: var(--bg-subtle); border: 1px solid transparent; border-radius: 12px;
+      padding: 10px 34px 10px 12px; font-size: 14px; color: var(--text-primary); outline: none;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239AA3B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
+    }
+    .field-select:focus { border-color: var(--accent); background-color: #fff; box-shadow: 0 0 0 3px var(--accent-soft); }
+
+    .stepper { display: flex; align-items: center; justify-content: space-between; background: var(--bg-subtle); border-radius: 12px; padding: 6px; }
+    .stepper-btn {
+      width: 36px; height: 36px; border-radius: 9px; background: #fff; border: none;
+      display: flex; align-items: center; justify-content: center; color: var(--text-primary);
+      box-shadow: 0 1px 2px rgba(15,23,32,.08); user-select: none;
+    }
+    .stepper-btn:active { transform: scale(.94); }
+    .stepper-val { font-weight: 700; font-size: 15px; }
+
+    .sheet-footer { display: flex; align-items: center; gap: 8px; padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--border); }
+    .btn {
+      font-size: 13px; font-weight: 600; padding: 9px 13px; border-radius: 10px;
+      display: inline-flex; align-items: center; gap: 6px; border: none; white-space: nowrap; user-select: none;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:active { background: var(--accent-hover); }
+    .btn-ghost { background: var(--bg-subtle); color: var(--text-primary); }
+    .btn-ghost:active { background: var(--border); }
+    .btn-danger-ghost { background: var(--danger-soft); color: var(--danger); }
+    .btn-info-ghost { background: var(--info-soft); color: var(--info); }
+
+    /* Sheet transition */
+    .sheet-enter-active, .sheet-leave-active { transition: opacity .25s ease; }
+    .sheet-enter-from, .sheet-leave-to { opacity: 0; }
+    .sheet-enter-active .sheet, .sheet-leave-active .sheet { transition: transform .28s cubic-bezier(.32,.72,0,1); }
+    .sheet-enter-from .sheet, .sheet-leave-to .sheet { transform: translateY(100%); }
+  </style>
+</head>
+<body>
+  <div class="viewport-bg">
+    <div id="app" class="app-shell">
+
+      <header class="topbar">
+        <div>
+          <h1 class="topbar-title">Hylder i fryseren</h1>
+          <p class="topbar-sub">{{ items.length }} {{ items.length === 1 ? 'vare' : 'varer' }} på lager</p>
+        </div>
+        <div class="segmented" role="tablist" aria-label="Visning">
+          <button class="seg-btn" :class="{ active: view === 'shelf' }" :aria-pressed="view === 'shelf'" @click="view = 'shelf'" aria-label="Hyldevisning">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+              <rect x="3" y="4" width="18" height="4" rx="1"></rect>
+              <rect x="3" y="10" width="18" height="4" rx="1"></rect>
+              <rect x="3" y="16" width="18" height="4" rx="1"></rect>
+            </svg>
+          </button>
+          <button class="seg-btn" :class="{ active: view === 'list' }" :aria-pressed="view === 'list'" @click="view = 'list'" aria-label="Listevisning">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="search-wrap">
+        <div class="search-field">
+          <span class="search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input v-model="searchQuery" type="text" placeholder="Søg efter vare eller størrelse" class="search-input" />
+          <button v-if="searchQuery" @click="searchQuery = ''" class="search-clear" aria-label="Ryd søgning">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Shelf view -->
+      <main v-if="view === 'shelf'" class="scroll-area">
+        <div v-if="sortedGroupedFilteredItems.length === 0" class="empty-state">Ingen varer fundet</div>
+        <section v-for="group in sortedGroupedFilteredItems" :key="group.shelf">
+          <div class="shelf-header">{{ group.shelf }}</div>
+          <div v-for="item in group.items" :key="item.id" class="item-row" @click="openEditModal(item)">
+            <div>
+              <div class="item-name">{{ item.name }}</div>
+              <div class="item-meta">{{ item.size }} <span class="dot">·</span> {{ formatDateDisplay(item.date) }}</div>
+            </div>
+            <div class="item-side">
+              <span class="qty-pill">{{ item.qty }} stk</span>
+              <span class="chevron">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- List view -->
+      <main v-else class="scroll-area">
+        <div class="sort-bar">
+          <button v-for="col in sortColumns" :key="col.key" class="sort-chip" :class="{ active: sortKey === col.key }" @click="sortBy(col.key)">
+            {{ col.label }}
+            <span v-if="sortKey === col.key" class="sort-arrow">
+              <svg v-if="sortAsc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <div v-if="sortedFilteredItems.length === 0" class="empty-state">Ingen varer fundet</div>
+        <div v-for="item in sortedFilteredItems" :key="item.id" class="item-row" @click="openEditModal(item)">
+          <div>
+            <div class="item-name">{{ item.name }}</div>
+            <div class="item-meta">
+              <span class="tag">{{ item.shelf }}</span>
+              <span class="dot">·</span> {{ item.size }} <span class="dot">·</span> {{ formatDateDisplay(item.date) }}
+            </div>
+          </div>
+          <div class="item-side">
+            <span class="qty-pill">{{ item.qty }} stk</span>
+            <span class="chevron">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </main>
+
+      <!-- Floating add button -->
+      <button @click="openAddModal" class="fab" aria-label="Tilføj vare">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+
+      <!-- Bottom sheet -->
+      <transition name="sheet">
+        <div v-if="activeModal" class="sheet-backdrop" @click.self="closeModal">
+          <div class="sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+              <h2>{{ isDuplicating ? 'Klon vare' : (form.id ? 'Rediger vare' : 'Tilføj ny vare') }}</h2>
+              <button class="icon-btn" @click="closeModal" aria-label="Luk">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Varenavn</label>
+              <input v-model="form.name" placeholder="f.eks. Kyllingebryst" class="field-input" />
+            </div>
+
+            <div class="field">
+              <label class="field-label">Størrelse / vægt</label>
+              <input v-model="form.size" placeholder="f.eks. 570g, stykvis" class="field-input" />
+            </div>
+
+            <div class="field">
+              <label class="field-label">Hylde / placering</label>
+              <select v-model="form.shelf" class="field-select">
+                <option>Hylde 1</option>
+                <option>Hylde 2</option>
+                <option>Hylde 3</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Antal</label>
+              <div class="stepper">
+                <button type="button" class="stepper-btn" @click="form.qty = Math.max(1, form.qty - 1)" aria-label="Færre">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+                <span class="stepper-val">{{ form.qty }} stk</span>
+                <button type="button" class="stepper-btn" @click="form.qty++" aria-label="Flere">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="field" style="margin-bottom: 4px;">
+              <label class="field-label">Dato tilføjet</label>
+              <input v-model="form.date" type="date" class="field-input" />
+            </div>
+
+            <div class="sheet-footer">
+              <button v-if="form.id && !isDuplicating" @click="deleteItem" type="button" class="btn btn-danger-ghost">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                  <path d="M10 11v6"></path>
+                  <path d="M14 11v6"></path>
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                </svg>
+                Slet
+              </button>
+              <button v-if="form.id && !isDuplicating" @click="duplicateItem" type="button" class="btn btn-info-ghost">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                  <rect x="9" y="9" width="12" height="12" rx="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Dupliker
+              </button>
+              <div style="display:flex; gap:8px; margin-left:auto;">
+                <button @click="closeModal" type="button" class="btn btn-ghost">Annuller</button>
+                <button @click="saveItem" type="button" class="btn btn-primary">{{ isDuplicating ? 'Gem klon' : 'Gem' }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          view: 'shelf',
+          items: [],
+          searchQuery: '',
+          activeModal: false,
+          isDuplicating: false,
+          sortKey: 'name',
+          sortAsc: true,
+          sortColumns: [
+            { key: 'name', label: 'Vare' },
+            { key: 'shelf', label: 'Hylde' },
+            { key: 'size', label: 'Størrelse' },
+            { key: 'qty', label: 'Antal' },
+            { key: 'date', label: 'Dato' }
+          ],
+          form: { id: null, name: '', size: '', shelf: 'Hylde 1', qty: 1, date: '' }
+        }
+      },
+      computed: {
+        filteredItems() {
+          if (!this.searchQuery.trim()) return this.items;
+          const q = this.searchQuery.toLowerCase();
+          return this.items.filter(i =>
+            (i.name && i.name.toLowerCase().includes(q)) ||
+            (i.size && i.size.toLowerCase().includes(q)) ||
+            (i.shelf && i.shelf.toLowerCase().includes(q))
+          );
+        },
+        sortedGroupedFilteredItems() {
+          const grouped = this.filteredItems.reduce((acc, item) => {
+            const shelf = item.shelf || 'Hylde 1';
+            (acc[shelf] = acc[shelf] || []).push(item);
+            return acc;
+          }, {});
+          const sortedKeys = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+          return sortedKeys.map(key => ({ shelf: key, items: grouped[key] }));
+        },
+        sortedFilteredItems() {
+          return [...this.filteredItems].sort((a, b) => {
+            let valA = a[this.sortKey] || '';
+            let valB = b[this.sortKey] || '';
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+            if (valA < valB) return this.sortAsc ? -1 : 1;
+            if (valA > valB) return this.sortAsc ? 1 : -1;
+            return 0;
+          });
+        }
+      },
+      methods: {
+        getTodayDate() {
+          const local = new Date();
+          local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+          return local.toJSON().slice(0, 10);
+        },
+        formatDateDisplay(dateStr) {
+          if (!dateStr) return '';
+          const parts = dateStr.split('-');
+          if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+          return dateStr;
+        },
+        async fetchItems() {
+          try {
+            const res = await fetch('api/items');
+            if (res.ok) this.items = await res.json();
+          } catch (e) {
+            console.error('Kunne ikke hente varer:', e);
+          }
+        },
+        async syncData() {
+          try {
+            const res = await fetch('api/items', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(this.items)
+            });
+            if (!res.ok) console.error('Server afviste at gemme data');
+          } catch (e) {
+            console.error('Fejl ved gem:', e);
+          }
+        },
+
+        // --- Modal + history handling ---
+        // Pushing a history entry when the sheet opens means the device/browser
+        // back button closes the sheet first, instead of leaving the page.
+        pushModalState() {
+          history.pushState({ modalOpen: true }, '');
+        },
+        closeModal() {
+          if (!this.activeModal) return;
+          this.activeModal = false;
+          this.isDuplicating = false;
+          if (history.state && history.state.modalOpen) {
+            history.back();
+          }
+        },
+        handlePopState() {
+          if (this.activeModal) {
+            this.activeModal = false;
+            this.isDuplicating = false;
+          }
+        },
+
+        openAddModal() {
+          this.isDuplicating = false;
+          this.form = { id: null, name: '', size: '', shelf: 'Hylde 1', qty: 1, date: this.getTodayDate() };
+          this.activeModal = true;
+          this.pushModalState();
+        },
+        openEditModal(item) {
+          this.isDuplicating = false;
+          this.form = { ...item };
+          if (!this.form.date) this.form.date = this.getTodayDate();
+          this.activeModal = true;
+          this.pushModalState();
+        },
+        duplicateItem() {
+          this.isDuplicating = true;
+          this.form = { ...this.form, id: null, date: this.getTodayDate() };
+        },
+        async saveItem() {
+          if (!this.form.name.trim()) {
+            alert('Venligst indtast et varenavn');
+            return;
+          }
+          if (!this.form.id || this.isDuplicating) {
+            this.form.id = 'item_' + Date.now();
+            this.items.push({ ...this.form });
+          } else {
+            const idx = this.items.findIndex(i => i.id === this.form.id);
+            if (idx !== -1) this.items[idx] = { ...this.form };
+          }
+          await this.syncData();
+          this.closeModal();
+        },
+        async deleteItem() {
+          if (confirm('Er du sikker på, at du vil slette denne vare?')) {
+            this.items = this.items.filter(i => i.id !== this.form.id);
+            await this.syncData();
+            this.closeModal();
+          }
+        },
+
+        sortBy(key) {
+          if (this.sortKey === key) {
+            this.sortAsc = !this.sortAsc;
+          } else {
+            this.sortKey = key;
+            this.sortAsc = true;
+          }
+        }
+      },
+      mounted() {
+        this.fetchItems();
+        window.addEventListener('popstate', this.handlePopState);
+      },
+      beforeUnmount() {
+        window.removeEventListener('popstate', this.handlePopState);
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>
