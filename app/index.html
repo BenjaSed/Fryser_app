@@ -39,7 +39,6 @@
       color: var(--text-primary);
       overscroll-behavior: none;
       height: 100%;
-      margin: 0;
     }
 
     button { touch-action: manipulation; font-family: inherit; }
@@ -80,13 +79,13 @@
       padding: 18px 18px 12px;
       border-bottom: 1px solid var(--border);
     }
-    .topbar-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
-    .topbar-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; margin-bottom: 0; }
+    .topbar-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+    .topbar-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
 
     .segmented { display: flex; background: var(--bg-subtle); border-radius: 10px; padding: 3px; gap: 2px; }
     .seg-btn {
       width: 34px; height: 30px; display: flex; align-items: center; justify-content: center;
-      border-radius: 8px; color: var(--text-tertiary); user-select: none; border: none; background: transparent; cursor: pointer;
+      border-radius: 8px; color: var(--text-tertiary); user-select: none;
     }
     .seg-btn.active { background: #fff; color: var(--accent); box-shadow: 0 1px 2px rgba(15,23,32,.1); }
 
@@ -96,7 +95,7 @@
     .search-icon { color: var(--text-tertiary); display: flex; flex-shrink: 0; }
     .search-input { flex: 1; background: transparent; border: none; padding: 9px 8px; font-size: 14px; color: var(--text-primary); outline: none; }
     .search-input::placeholder { color: var(--text-tertiary); }
-    .search-clear { color: var(--text-tertiary); display: flex; padding: 4px; flex-shrink: 0; background: none; border: none; cursor: pointer; }
+    .search-clear { color: var(--text-tertiary); display: flex; padding: 4px; flex-shrink: 0; }
 
     /* Scroll area */
     .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
@@ -129,7 +128,7 @@
     .sort-chip {
       flex-shrink: 0; display: flex; align-items: center; gap: 4px;
       font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
-      background: var(--bg-subtle); padding: 6px 11px; border-radius: 99px; white-space: nowrap; user-select: none; border: none; cursor: pointer;
+      background: var(--bg-subtle); padding: 6px 11px; border-radius: 99px; white-space: nowrap; user-select: none;
     }
     .sort-chip.active { background: var(--accent-soft); color: var(--accent-hover); }
 
@@ -142,7 +141,7 @@
       background: var(--accent); color: #fff; border: none;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 10px 24px -6px rgba(30,158,108,.55), 0 2px 6px rgba(15,23,32,.15);
-      z-index: 20; cursor: pointer;
+      z-index: 20;
     }
     .fab:active { transform: scale(.94); }
 
@@ -163,8 +162,8 @@
     }
     .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 99px; margin: 4px auto 14px; }
     .sheet-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .sheet-header h2 { font-size: 16px; font-weight: 700; margin: 0; }
-    .icon-btn { color: var(--text-tertiary); display: flex; padding: 6px; border-radius: 8px; border: none; background: none; cursor: pointer; }
+    .sheet-header h2 { font-size: 16px; font-weight: 700; }
+    .icon-btn { color: var(--text-tertiary); display: flex; padding: 6px; border-radius: 8px; }
     .icon-btn:active { background: var(--bg-subtle); }
 
     .field { margin-bottom: 14px; }
@@ -186,9 +185,9 @@
 
     .stepper { display: flex; align-items: center; justify-content: space-between; background: var(--bg-subtle); border-radius: 12px; padding: 6px; }
     .stepper-btn {
-      width: 36px; height: 36px; border-radius: 9px; background: #fff; border: none;
+      width: 36px; height: 36px; border-radius: 99px; background: #fff; border: none;
       display: flex; align-items: center; justify-content: center; color: var(--text-primary);
-      box-shadow: 0 1px 2px rgba(15,23,32,.08); user-select: none; cursor: pointer;
+      box-shadow: 0 1px 2px rgba(15,23,32,.08); user-select: none;
     }
     .stepper-btn:active { transform: scale(.94); }
     .stepper-val { font-weight: 700; font-size: 15px; }
@@ -196,7 +195,7 @@
     .sheet-footer { display: flex; align-items: center; gap: 8px; padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--border); }
     .btn {
       font-size: 13px; font-weight: 600; padding: 9px 13px; border-radius: 10px;
-      display: inline-flex; align-items: center; gap: 6px; border: none; white-space: nowrap; user-select: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; border: none; white-space: nowrap; user-select: none;
     }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:active { background: var(--accent-hover); }
@@ -235,7 +234,9 @@
               <line x1="8" y1="12" x2="21" y2="12"></line>
               <line x1="8" y1="18" x2="21" y2="18"></line>
               <line x1="3" y1="6" x2="3.01" y2="6"></line>
+
               <line x1="3" y1="12" x2="3.01" y2="12"></line>
+
               <line x1="3" y1="18" x2="3.01" y2="18"></line>
             </svg>
           </button>
@@ -353,7 +354,7 @@
             <div class="field">
               <label class="field-label">Hylde / placering</label>
               <select v-model="form.shelf" class="field-select">
-                <option v-for="shelf in availableShelves" :key="shelf" :value="shelf">{{ shelf }}</option>
+                <option v-for="drawer in availableDrawers" :key="drawer" :value="drawer">{{ drawer }}</option>
               </select>
             </div>
 
@@ -418,6 +419,7 @@
         return {
           view: 'shelf',
           items: [],
+          configuredDrawers: ['Hylde 1', 'Hylde 2', 'Hylde 3'],
           searchQuery: '',
           activeModal: false,
           isDuplicating: false,
@@ -434,12 +436,13 @@
         }
       },
       computed: {
-        availableShelves() {
-          const defaults = ['Hylde 1', 'Hylde 2', 'Hylde 3', 'Hylde 4'];
-          const used = this.items.map(i => i.shelf).filter(Boolean);
-          return Array.from(new Set([...defaults, ...used])).sort((a, b) =>
-            a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
-          );
+        availableDrawers() {
+          const list = [...this.configuredDrawers];
+          const hasUnknown = this.items.some(i => i.shelf === 'Ukendt hylde') || this.form.shelf === 'Ukendt hylde';
+          if (hasUnknown && !list.includes('Ukendt hylde')) {
+            list.push('Ukendt hylde');
+          }
+          return list;
         },
         filteredItems() {
           if (!this.searchQuery.trim()) return this.items;
@@ -451,18 +454,30 @@
           );
         },
         sortedGroupedFilteredItems() {
+          const defaultDrawer = this.configuredDrawers[0] || 'Hylde 1';
           const grouped = this.filteredItems.reduce((acc, item) => {
-            const shelf = item.shelf || 'Hylde 1';
+            const shelf = item.shelf || defaultDrawer;
             (acc[shelf] = acc[shelf] || []).push(item);
             return acc;
           }, {});
-          const sortedKeys = Object.keys(grouped).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+          const sortedKeys = Object.keys(grouped).sort((a, b) => {
+            const indexA = this.configuredDrawers.indexOf(a);
+            const indexB = this.configuredDrawers.indexOf(b);
+            if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+            if (indexA !== -1) return -1;
+            if (indexB !== -1) return 1;
+            if (a === 'Ukendt hylde') return 1;
+            if (b === 'Ukendt hylde') return -1;
+            return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+          });
+
           return sortedKeys.map(key => ({ shelf: key, items: grouped[key] }));
         },
         sortedFilteredItems() {
           return [...this.filteredItems].sort((a, b) => {
-            let valA = a[this.sortKey] ?? '';
-            let valB = b[this.sortKey] ?? '';
+            let valA = a[this.sortKey] || '';
+            let valB = b[this.sortKey] || '';
             if (typeof valA === 'string') valA = valA.toLowerCase();
             if (typeof valB === 'string') valB = valB.toLowerCase();
             if (valA < valB) return this.sortAsc ? -1 : 1;
@@ -483,39 +498,56 @@
           if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
           return dateStr;
         },
+        async fetchConfig() {
+          try {
+            const res = await fetch('api/config');
+            if (res.ok) {
+              const data = await res.json();
+              if (Array.isArray(data.drawers) && data.drawers.length > 0) {
+                this.configuredDrawers = data.drawers;
+              }
+            }
+          } catch (e) {
+            console.error('Kunne ikke hente konfiguration:', e);
+          }
+        },
         async fetchItems() {
           try {
             const res = await fetch('api/items');
-            if (res.ok) {
-              this.items = await res.json();
-              localStorage.setItem('freezer_items', JSON.stringify(this.items));
-              return;
-            }
+            if (res.ok) this.items = await res.json();
           } catch (e) {
-            console.warn('API ikke tilgængelig, skifter til localStorage:', e);
+            console.error('Kunne ikke hente varer:', e);
           }
-          const saved = localStorage.getItem('freezer_items');
-          if (saved) {
-            try {
-              this.items = JSON.parse(saved);
-            } catch (e) {
-              console.error('Fejl ved læsning af local data:', e);
+        },
+        reconcileShelves() {
+          let changed = false;
+          const defaultDrawer = this.configuredDrawers[0] || 'Hylde 1';
+          this.items.forEach(item => {
+            if (!item.shelf) {
+              item.shelf = defaultDrawer;
+              changed = true;
+            } else if (!this.configuredDrawers.includes(item.shelf) && item.shelf !== 'Ukendt hylde') {
+              item.shelf = 'Ukendt hylde';
+              changed = true;
             }
+          });
+          if (changed) {
+            this.syncData();
           }
         },
         async syncData() {
-          localStorage.setItem('freezer_items', JSON.stringify(this.items));
           try {
             const res = await fetch('api/items', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(this.items)
             });
-            if (!res.ok) console.warn('Server kunne ikke opdatere data');
+            if (!res.ok) console.error('Server afviste at gemme data');
           } catch (e) {
-            console.warn('Netværksfejl ved synkronisering til backend:', e);
+            console.error('Fejl ved gem:', e);
           }
         },
+
         pushModalState() {
           history.pushState({ modalOpen: true }, '');
         },
@@ -533,9 +565,11 @@
             this.isDuplicating = false;
           }
         },
+
         openAddModal() {
           this.isDuplicating = false;
-          this.form = { id: null, name: '', size: '', shelf: this.availableShelves[0] || 'Hylde 1', qty: 1, date: this.getTodayDate() };
+          const defaultDrawer = this.configuredDrawers[0] || 'Hylde 1';
+          this.form = { id: null, name: '', size: '', shelf: defaultDrawer, qty: 1, date: this.getTodayDate() };
           this.activeModal = true;
           this.pushModalState();
         },
@@ -572,6 +606,7 @@
             this.closeModal();
           }
         },
+
         sortBy(key) {
           if (this.sortKey === key) {
             this.sortAsc = !this.sortAsc;
@@ -581,14 +616,15 @@
           }
         }
       },
-      mounted() {
-        this.fetchItems();
+      async mounted() {
+        await Promise.all([this.fetchConfig(), this.fetchItems()]);
+        this.reconcileShelves();
         window.addEventListener('popstate', this.handlePopState);
       },
       beforeUnmount() {
         window.removeEventListener('popstate', this.handlePopState);
       }
-    }).mount('#app');
+    }).mount('#app')
   </script>
 </body>
 </html>
