@@ -1,6 +1,6 @@
 {
   "name": "Fryser oversigt",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "slug": "freezer_manager",
   "description": "AppSheet freezer replica with search, duplication, and list views.",
   "arch": ["amd64", "aarch64", "armv7"],
