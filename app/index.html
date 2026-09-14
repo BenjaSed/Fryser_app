@@ -39,6 +39,7 @@
       color: var(--text-primary);
       overscroll-behavior: none;
       height: 100%;
+      margin: 0;
     }
 
     button { touch-action: manipulation; font-family: inherit; }
@@ -79,13 +80,13 @@
       padding: 18px 18px 12px;
       border-bottom: 1px solid var(--border);
     }
-    .topbar-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-    .topbar-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+    .topbar-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+    .topbar-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; margin-bottom: 0; }
 
     .segmented { display: flex; background: var(--bg-subtle); border-radius: 10px; padding: 3px; gap: 2px; }
     .seg-btn {
       width: 34px; height: 30px; display: flex; align-items: center; justify-content: center;
-      border-radius: 8px; color: var(--text-tertiary); user-select: none;
+      border-radius: 8px; color: var(--text-tertiary); user-select: none; border: none; background: transparent; cursor: pointer;
     }
     .seg-btn.active { background: #fff; color: var(--accent); box-shadow: 0 1px 2px rgba(15,23,32,.1); }
 
@@ -95,7 +96,7 @@
     .search-icon { color: var(--text-tertiary); display: flex; flex-shrink: 0; }
     .search-input { flex: 1; background: transparent; border: none; padding: 9px 8px; font-size: 14px; color: var(--text-primary); outline: none; }
     .search-input::placeholder { color: var(--text-tertiary); }
-    .search-clear { color: var(--text-tertiary); display: flex; padding: 4px; flex-shrink: 0; }
+    .search-clear { color: var(--text-tertiary); display: flex; padding: 4px; flex-shrink: 0; background: none; border: none; cursor: pointer; }
 
     /* Scroll area */
     .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
@@ -128,7 +129,7 @@
     .sort-chip {
       flex-shrink: 0; display: flex; align-items: center; gap: 4px;
       font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
-      background: var(--bg-subtle); padding: 6px 11px; border-radius: 99px; white-space: nowrap; user-select: none;
+      background: var(--bg-subtle); padding: 6px 11px; border-radius: 99px; white-space: nowrap; user-select: none; border: none; cursor: pointer;
     }
     .sort-chip.active { background: var(--accent-soft); color: var(--accent-hover); }
 
@@ -141,7 +142,7 @@
       background: var(--accent); color: #fff; border: none;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 10px 24px -6px rgba(30,158,108,.55), 0 2px 6px rgba(15,23,32,.15);
-      z-index: 20;
+      z-index: 20; cursor: pointer;
     }
     .fab:active { transform: scale(.94); }
 
@@ -162,8 +163,8 @@
     }
     .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 99px; margin: 4px auto 14px; }
     .sheet-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .sheet-header h2 { font-size: 16px; font-weight: 700; }
-    .icon-btn { color: var(--text-tertiary); display: flex; padding: 6px; border-radius: 8px; }
+    .sheet-header h2 { font-size: 16px; font-weight: 700; margin: 0; }
+    .icon-btn { color: var(--text-tertiary); display: flex; padding: 6px; border-radius: 8px; border: none; background: none; cursor: pointer; }
     .icon-btn:active { background: var(--bg-subtle); }
 
     .field { margin-bottom: 14px; }
@@ -187,7 +188,7 @@
     .stepper-btn {
       width: 36px; height: 36px; border-radius: 9px; background: #fff; border: none;
       display: flex; align-items: center; justify-content: center; color: var(--text-primary);
-      box-shadow: 0 1px 2px rgba(15,23,32,.08); user-select: none;
+      box-shadow: 0 1px 2px rgba(15,23,32,.08); user-select: none; cursor: pointer;
     }
     .stepper-btn:active { transform: scale(.94); }
     .stepper-val { font-weight: 700; font-size: 15px; }
@@ -195,7 +196,7 @@
     .sheet-footer { display: flex; align-items: center; gap: 8px; padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--border); }
     .btn {
       font-size: 13px; font-weight: 600; padding: 9px 13px; border-radius: 10px;
-      display: inline-flex; align-items: center; gap: 6px; border: none; white-space: nowrap; user-select: none;
+      display: inline-flex; align-items: center; gap: 6px; border: none; white-space: nowrap; user-select: none; cursor: pointer;
     }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:active { background: var(--accent-hover); }
@@ -352,9 +353,7 @@
             <div class="field">
               <label class="field-label">Hylde / placering</label>
               <select v-model="form.shelf" class="field-select">
-                <option>Hylde 1</option>
-                <option>Hylde 2</option>
-                <option>Hylde 3</option>
+                <option v-for="shelf in availableShelves" :key="shelf" :value="shelf">{{ shelf }}</option>
               </select>
             </div>
 
@@ -435,6 +434,13 @@
         }
       },
       computed: {
+        availableShelves() {
+          const defaults = ['Hylde 1', 'Hylde 2', 'Hylde 3', 'Hylde 4'];
+          const used = this.items.map(i => i.shelf).filter(Boolean);
+          return Array.from(new Set([...defaults, ...used])).sort((a, b) =>
+            a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+          );
+        },
         filteredItems() {
           if (!this.searchQuery.trim()) return this.items;
           const q = this.searchQuery.toLowerCase();
@@ -455,8 +461,8 @@
         },
         sortedFilteredItems() {
           return [...this.filteredItems].sort((a, b) => {
-            let valA = a[this.sortKey] || '';
-            let valB = b[this.sortKey] || '';
+            let valA = a[this.sortKey] ?? '';
+            let valB = b[this.sortKey] ?? '';
             if (typeof valA === 'string') valA = valA.toLowerCase();
             if (typeof valB === 'string') valB = valB.toLowerCase();
             if (valA < valB) return this.sortAsc ? -1 : 1;
@@ -480,27 +486,36 @@
         async fetchItems() {
           try {
             const res = await fetch('api/items');
-            if (res.ok) this.items = await res.json();
+            if (res.ok) {
+              this.items = await res.json();
+              localStorage.setItem('freezer_items', JSON.stringify(this.items));
+              return;
+            }
           } catch (e) {
-            console.error('Kunne ikke hente varer:', e);
+            console.warn('API ikke tilgængelig, skifter til localStorage:', e);
+          }
+          const saved = localStorage.getItem('freezer_items');
+          if (saved) {
+            try {
+              this.items = JSON.parse(saved);
+            } catch (e) {
+              console.error('Fejl ved læsning af local data:', e);
+            }
           }
         },
         async syncData() {
+          localStorage.setItem('freezer_items', JSON.stringify(this.items));
           try {
             const res = await fetch('api/items', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(this.items)
             });
-            if (!res.ok) console.error('Server afviste at gemme data');
+            if (!res.ok) console.warn('Server kunne ikke opdatere data');
           } catch (e) {
-            console.error('Fejl ved gem:', e);
+            console.warn('Netværksfejl ved synkronisering til backend:', e);
           }
         },
-
-        // --- Modal + history handling ---
-        // Pushing a history entry when the sheet opens means the device/browser
-        // back button closes the sheet first, instead of leaving the page.
         pushModalState() {
           history.pushState({ modalOpen: true }, '');
         },
@@ -518,10 +533,9 @@
             this.isDuplicating = false;
           }
         },
-
         openAddModal() {
           this.isDuplicating = false;
-          this.form = { id: null, name: '', size: '', shelf: 'Hylde 1', qty: 1, date: this.getTodayDate() };
+          this.form = { id: null, name: '', size: '', shelf: this.availableShelves[0] || 'Hylde 1', qty: 1, date: this.getTodayDate() };
           this.activeModal = true;
           this.pushModalState();
         },
@@ -558,7 +572,6 @@
             this.closeModal();
           }
         },
-
         sortBy(key) {
           if (this.sortKey === key) {
             this.sortAsc = !this.sortAsc;
@@ -575,7 +588,7 @@
       beforeUnmount() {
         window.removeEventListener('popstate', this.handlePopState);
       }
-    }).mount('#app')
+    }).mount('#app');
   </script>
 </body>
 </html>
