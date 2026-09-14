@@ -12,6 +12,22 @@ app = FastAPI()
 # /data is the official persistent storage directory for Home Assistant Add-ons
 DB_FILE = "/data/freezer_db.json"
 
+# Add this constant near DB_FILE
+OPTIONS_FILE = "/data/options.json"
+DEFAULT_DRAWERS = ["Hylde 1", "Hylde 2", "Hylde 3"]
+
+@app.get("/api/config")
+async def get_config():
+    if os.path.exists(OPTIONS_FILE):
+        try:
+            async with aiofiles.open(OPTIONS_FILE, mode="r", encoding="utf-8") as f:
+                content = await f.read()
+                data = json.loads(content)
+                return {"drawers": data.get("drawers", DEFAULT_DRAWERS)}
+        except Exception as e:
+            print(f"Error reading options file: {e}")
+    return {"drawers": DEFAULT_DRAWERS}
+
 # Fallback for local testing outside of Home Assistant
 if not os.path.exists("/data"):
     DB_FILE = "freezer_db.json"
